@@ -4,6 +4,8 @@
 #include <math.h>
 #include "particle_filter.h"
 
+#include "tests.cpp"
+
 using namespace std;
 
 // for convenience
@@ -24,7 +26,10 @@ std::string hasData(std::string s) {
   return "";
 }
 
-int main() {
+int main(int argc, char **argv) {
+//  testing::InitGoogleTest(&argc, argv);
+//  return RUN_ALL_TESTS();
+
   uWS::Hub h;
 
   //Set up parameters here
