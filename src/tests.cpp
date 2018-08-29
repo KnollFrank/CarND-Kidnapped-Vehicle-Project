@@ -1,4 +1,4 @@
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include "particle_filter.h"
 
 TEST(ParticleFilterTest, ShouldInit) {
@@ -9,6 +9,7 @@ TEST(ParticleFilterTest, ShouldInit) {
   double sense_y = 12.3;
   double sense_theta = 45.7;
   pf.init(sense_x, sense_y, sense_theta, sigma_pos);
-  // TODO: alle TODOS von init() testen
+  ASSERT_EQ(5, pf.particles.size());
+  // ASSERT_THAT(pf.weights, ElementsAre(5, 10, 15));
   ASSERT_EQ(true, pf.initialized());
 }
