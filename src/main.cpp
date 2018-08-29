@@ -2,6 +2,7 @@
 #include <iostream>
 #include "json.hpp"
 #include <math.h>
+#include <string.h>
 #include "particle_filter.h"
 
 #include "tests.cpp"
@@ -27,8 +28,10 @@ std::string hasData(std::string s) {
 }
 
 int main(int argc, char **argv) {
-//  testing::InitGoogleTest(&argc, argv);
-//  return RUN_ALL_TESTS();
+  if (argc > 1 && strcmp(argv[1], "test") == 0) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+  }
 
   uWS::Hub h;
 
