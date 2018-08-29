@@ -4,7 +4,7 @@
 TEST(ParticleFilterTest, ShouldInit) {
   // GIVEN
   ParticleFilter pf;
-  double sigma_pos[3] = { 0.3, 0.3, 0.01 };
+  double sigma_pos[3] = {0.3, 0.3, 0.01};
   double x = 10.1;
   double y = 12.3;
   double theta = 45.7;
@@ -28,4 +28,22 @@ TEST(ParticleFilterTest, ShouldInit) {
   }
 
   ASSERT_TRUE(pf.initialized());
+}
+
+TEST(ParticleFilterTest, ShouldPredict) {
+  // GIVEN
+  ParticleFilter pf;
+  double sigma_pos[3] = {0.0, 0.0, 0.0};
+  pf.init(0, 0, 0, sigma_pos);
+
+  // WHEN
+  double delta_t = 1.0;
+  double velocity = 1.0;
+  double yaw_rate = M_PI/2.0;
+  pf.prediction(delta_t, sigma_pos, velocity, yaw_rate);
+
+  // THEN
+  EXPECT_DOUBLE_EQ(0.0, pf.particles[0].x) << "particles[0].x";
+  EXPECT_DOUBLE_EQ(1.0, pf.particles[0].y) << "particles[0].y";
+  EXPECT_DOUBLE_EQ(M_PI/2.0, pf.particles[0].theta) << "particles[0].theta";
 }
