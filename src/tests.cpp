@@ -43,7 +43,7 @@ TEST(ParticleFilterTest, ShouldPredict) {
   pf.prediction(delta_t, sigma_pos, velocity, yaw_rate);
 
   // THEN
-  EXPECT_DOUBLE_EQ(0.0, pf.particles[0].x) << "particles[0].x";
-  EXPECT_DOUBLE_EQ(1.0, pf.particles[0].y) << "particles[0].y";
-  EXPECT_DOUBLE_EQ(M_PI/2.0, pf.particles[0].theta) << "particles[0].theta";
+  EXPECT_NEAR(0.0, pf.particles[0].x, 0.00001) << "particles[0].x";
+  EXPECT_NEAR(1.0, pf.particles[0].y, 0.00001) << "particles[0].y";
+  EXPECT_NEAR(M_PI/2.0, pf.particles[0].theta, 0.00001) << "particles[0].theta";
 }
