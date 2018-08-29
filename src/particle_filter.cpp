@@ -28,13 +28,13 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 
   std::random_device rd { };
   std::mt19937 gen { rd() };
-  std::normal_distribution<> d { 0, 1 };
+  std::normal_distribution<> randn { 0.0, 1.0 };
 
   for (int i = 0; i < num_particles; i++) {
     Particle particle;
-    particle.x = x + d(gen) * std[0];
-    particle.y = y + d(gen) * std[1];
-    particle.theta = theta + d(gen) * std[2];
+    particle.x = x + randn(gen) * std[0];
+    particle.y = y + randn(gen) * std[1];
+    particle.theta = theta + randn(gen) * std[2];
     particles.push_back(particle);
   }
 
