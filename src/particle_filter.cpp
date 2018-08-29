@@ -26,13 +26,20 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   // NOTE: Consult particle_filter.h for more information about this method (and others in this file).
   num_particles = 5;
 
-  for(int i = 0; i < num_particles; i++)
-  {
+  std::random_device rd { };
+  std::mt19937 gen { rd() };
+  std::normal_distribution<> d { 0, 1 };
+
+  for (int i = 0; i < num_particles; i++) {
     Particle particle;
-    particle.x = x;
-    particle.y = y;
-    particle.theta = theta;
+    particle.x = x + d(gen) * std[0];
+    particle.y = y + d(gen) * std[1];
+    particle.theta = theta + d(gen) * std[2];
     particles.push_back(particle);
+  }
+
+  for (int i = 0; i < num_particles; i++) {
+    weights.push_back(1.0);
   }
 
   is_initialized = true;

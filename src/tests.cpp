@@ -10,6 +10,13 @@ TEST(ParticleFilterTest, ShouldInit) {
   double sense_theta = 45.7;
   pf.init(sense_x, sense_y, sense_theta, sigma_pos);
   ASSERT_EQ(5, pf.particles.size());
-  // ASSERT_THAT(pf.weights, ElementsAre(5, 10, 15));
+  for (int i = 0; i < pf.particles.size(); ++i) {
+    EXPECT_EQ(1, pf.particles[i].x) << "Vectors x and y differ at index " << i;
+  }
+
+  ASSERT_EQ(5, pf.weights.size());
+  for (int i = 0; i < pf.weights.size(); ++i) {
+    EXPECT_EQ(1, pf.weights[i]) << "Vectors x and y differ at index " << i;
+  }
   ASSERT_EQ(true, pf.initialized());
 }
