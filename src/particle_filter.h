@@ -93,14 +93,8 @@ class ParticleFilter {
 
   LandmarkObs getObsInMapCoords(const Particle &part, const LandmarkObs &obs);
 
-  /**
-   * associateLandmark uses a naive nearest neighbor algorithm to find the closest map landmark
-   *   to a given observation point.
-   * @param converted_obs landmark observation in map coordinates
-   * @param map_landmarks map structure containing all known landmarks
-   */
-  LandmarkObs associateLandmark(const LandmarkObs &converted_obs,
-                                const Map &map_landmarks);
+  LandmarkObs associateObsWithLandmark(const LandmarkObs &converted_obs,
+                                       const Map &map_landmarks);
 
   /**
    * calculateWeights uses a Multivariate-Gaussian Probability to assess the likelihood

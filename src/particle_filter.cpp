@@ -92,7 +92,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   //   http://planning.cs.uiuc.edu/node99.html
 
   LandmarkObs converted_obs;
-  LandmarkObs best_landmark;
+  LandmarkObs landmark;
 
   weights.clear();
 
@@ -100,14 +100,11 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     double prob = 1.;
 
     for (int k = 0; k < int(observations.size()); k++) {
-      //  1 - For each particle convert measurements to map coordinate
       converted_obs = getObsInMapCoords(particles[i], observations[k]);
+      landmark = associateObsWithLandmark(converted_obs, map_landmarks);
 
-      //  2 - Assign observation to a landmark
-      best_landmark = associateLandmark(converted_obs, map_landmarks);
-
-      //  3 - Calculate weight for the pair obs x best landmark
-      double e = calculateWeights(converted_obs, best_landmark, std_landmark);
+      //  3 - Calculate weight for the pair obs x landmark
+      double e = calculateWeights(converted_obs, landmark, std_landmark);
 
       //  4 - Accumulate weights for particle
       prob *= e;
@@ -154,24 +151,20 @@ LandmarkObs ParticleFilter::getObsInMapCoords(const Particle &part,
   return transformed_coords;
 }
 
-LandmarkObs ParticleFilter::associateLandmark(const LandmarkObs &converted_obs,
-                                              const Map &map_landmarks) {
-
+LandmarkObs ParticleFilter::associateObsWithLandmark(const LandmarkObs &obs,
+                                                     const Map &map_landmarks) {
   Map::single_landmark_s min =
       *std::min_element(
           map_landmarks.landmark_list.begin(),
           map_landmarks.landmark_list.end(),
-          [converted_obs](const Map::single_landmark_s &a, const Map::single_landmark_s &b)
+          [obs](const Map::single_landmark_s &landmark1, const Map::single_landmark_s &landmark2)
           {
-            double distance1 = dist(converted_obs.x, converted_obs.y, a.x_f, a.y_f);
-            double distance2 = dist(converted_obs.x, converted_obs.y, b.x_f, b.y_f);
+            double distance1 = dist(obs.x, obs.y, landmark1.x_f, landmark1.y_f);
+            double distance2 = dist(obs.x, obs.y, landmark2.x_f, landmark2.y_f);
             return distance1 < distance2;
           });
 
-  LandmarkObs best_landmark;
-  best_landmark.x = min.x_f;
-  best_landmark.y = min.y_f;
-  return best_landmark;
+  return LandmarkObs { min.x_f, min.y_f };
 }
 
 double ParticleFilter::calculateWeights(const LandmarkObs &obs,
