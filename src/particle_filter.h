@@ -93,8 +93,8 @@ class ParticleFilter {
 
   LandmarkObs getObsInMapCoords(const Particle &part, const LandmarkObs &obs);
 
-  LandmarkObs associateObsWithLandmark(const LandmarkObs &converted_obs,
-                                       const Map &map_landmarks);
+  LandmarkObs getLandmarkBestMatchingObs(const LandmarkObs &converted_obs,
+                                         const Map &map_landmarks);
 
   /**
    * calculateWeights uses a Multivariate-Gaussian Probability to assess the likelihood
@@ -105,6 +105,7 @@ class ParticleFilter {
    */
   double getWeight(const LandmarkObs &obs, const LandmarkObs &best_landmark,
                    double std_landmark[]);
+  double gauss(double x, double mean, double stddev);
 
   std::string getAssociations(Particle best);
   std::string getSenseX(Particle best);

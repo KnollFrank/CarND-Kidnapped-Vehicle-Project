@@ -91,7 +91,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   //   3.33
   //   http://planning.cs.uiuc.edu/node99.html
 
-  LandmarkObs converted_obs;
+  LandmarkObs obsInMapCoords;
   LandmarkObs landmark;
 
   weights.clear();
@@ -100,14 +100,11 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     double prob = 1.;
 
     for (int k = 0; k < observations.size(); k++) {
-      converted_obs = getObsInMapCoords(particles[i], observations[k]);
-      landmark = associateObsWithLandmark(converted_obs, map_landmarks);
-
-      //  3 - Calculate weight for the pair obs x landmark
-      double weight = getWeight(converted_obs, landmark, std_landmark);
-
-      //  4 - Accumulate weights for particle
-      prob *= weight;
+      obsInMapCoords = getObsInMapCoords(particles[i], observations[k]);
+      prob *= getWeight(
+          obsInMapCoords,
+          getLandmarkBestMatchingObs(obsInMapCoords, map_landmarks),
+          std_landmark);
     }
 
     // store weight in particle
@@ -145,8 +142,9 @@ LandmarkObs ParticleFilter::getObsInMapCoords(const Particle &part,
   return LandmarkObs { x, y };
 }
 
-LandmarkObs ParticleFilter::associateObsWithLandmark(const LandmarkObs &obs,
-                                                     const Map &map_landmarks) {
+LandmarkObs ParticleFilter::getLandmarkBestMatchingObs(
+    const LandmarkObs &obs, const Map &map_landmarks) {
+
   Map::single_landmark_s min =
       *std::min_element(
           map_landmarks.landmark_list.begin(),
@@ -161,16 +159,17 @@ LandmarkObs ParticleFilter::associateObsWithLandmark(const LandmarkObs &obs,
   return LandmarkObs { min.x_f, min.y_f };
 }
 
-double gauss(double x, double mean, double stddev) {
+double ParticleFilter::gauss(double x, double mean, double stddev) {
   double dx = x - mean;
   double var = stddev * stddev;
   return 1.0 / (stddev * sqrt(2.0 * M_PI)) * exp(-dx * dx / (2.0 * var));
 }
 
 double ParticleFilter::getWeight(const LandmarkObs &obs,
-                                        const LandmarkObs &best_landmark,
-                                        double std_landmark[]) {
-  return gauss(obs.x, best_landmark.x, std_landmark[0]) * gauss(obs.y, best_landmark.y, std_landmark[1]);
+                                 const LandmarkObs &best_landmark,
+                                 double std_landmark[]) {
+  return gauss(obs.x, best_landmark.x, std_landmark[0])
+      * gauss(obs.y, best_landmark.y, std_landmark[1]);
 }
 
 string ParticleFilter::getAssociations(Particle best) {
