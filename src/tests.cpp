@@ -15,7 +15,7 @@ TEST(ParticleFilterTest, ShouldInit) {
   pf.init(x, y, theta, sigma_pos);
 
   // THEN
-  ASSERT_EQ(5, pf.particles.size());
+  ASSERT_EQ(50, pf.particles.size());
   for (int i = 0; i < pf.particles.size(); ++i) {
     EXPECT_NEAR(x, pf.particles[i].x, 3*sigma_pos[0]) << "particles.x at index " << i;
     EXPECT_NEAR(y, pf.particles[i].y, 3*sigma_pos[1]) << "particles.y at index " << i;

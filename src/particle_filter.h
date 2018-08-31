@@ -74,15 +74,6 @@ class ParticleFilter {
                   double yaw_rate);
 
   /**
-   * dataAssociation Finds which observations correspond to which landmarks (likely by using
-   *   a nearest-neighbors data association).
-   * @param predicted Vector of predicted landmark observations
-   * @param observations Vector of landmark observations
-   */
-  void dataAssociation(std::vector<LandmarkObs> predicted,
-                       std::vector<LandmarkObs>& observations);
-
-  /**
    * updateWeights Updates the weights for each particle based on the likelihood of the
    *   observed measurements.
    * @param sensor_range Range [m] of sensor
@@ -100,14 +91,27 @@ class ParticleFilter {
    */
   void resample();
 
-  /*
-   * Set a particles list of associations, along with the associations calculated world x,y coordinates
-   * This can be a very useful debugging tool to make sure transformations are correct and assocations correctly connected
+  LandmarkObs transformCoords(Particle part, LandmarkObs obs);
+
+  /**
+   * associateLandmark uses a naive nearest neighbor algorithm to find the closest map landmark
+   *   to a given observation point.
+   * @param converted_obs landmark observation in map coordinates
+   * @param map_landmarks map structure containing all known landmarks
+   * @param std_landmark noise array with uncertainties in measures on x and y
    */
-  Particle SetAssociations(Particle& particle,
-                           const std::vector<int>& associations,
-                           const std::vector<double>& sense_x,
-                           const std::vector<double>& sense_y);
+  LandmarkObs associateLandmark(LandmarkObs converted_obs, Map map_landmarks,
+                                double std_landmark[]);
+
+  /**
+   * calculateWeights uses a Multivariate-Gaussian Probability to assess the likelihood
+   *  of an observation matching a map landmark.
+   * @param obs landmark observation in map coordinates
+   * @param best_landmark best estimate of what landmark corresponds to the observed measurement
+   * @param std_landmark noise array with uncertainties in measures on x and y
+   */
+  double calculateWeights(LandmarkObs obs, LandmarkObs best_landmark,
+                          double std_landmark[]);
 
   std::string getAssociations(Particle best);
   std::string getSenseX(Particle best);
