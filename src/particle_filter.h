@@ -113,7 +113,7 @@ class ParticleFilter {
                    const Map &map_landmarks);
   double gauss(double x, double mean, double stddev);
   void addNoise(Particle &particle, double std_pos[]);
-  double multiply(std::vector<double> numbers);
+  double multiply(const std::vector<double> &numbers);
 
   std::string getAssociations(Particle best);
   std::string getSenseX(Particle best);

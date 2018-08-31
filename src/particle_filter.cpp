@@ -79,7 +79,7 @@ void ParticleFilter::predictParticle(Particle &particle, double delta_t,
 }
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
-                                   const std::vector<LandmarkObs> &observations,
+                                   const vector<LandmarkObs> &observations,
                                    const Map &map_landmarks) {
 
   // TODO: Update the weights of each particle using a mult-variate Gaussian distribution. You can read
@@ -99,15 +99,16 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   }
 }
 
-template<typename Collection, typename Collection2, typename unop>
-Collection2 map2(Collection col, Collection2 result, unop op) {
-  std::transform(col.begin(), col.end(), result.begin(), op);
+template<typename Collection, typename unop>
+vector<double> map2(Collection col, unop op) {
+  vector<double> result(col.size());
+  transform(col.begin(), col.end(), result.begin(), op);
   return result;
 }
 
 double ParticleFilter::getWeight(const Particle &particle,
                                  double std_landmark[],
-                                 const std::vector<LandmarkObs> &observations,
+                                 const vector<LandmarkObs> &observations,
                                  const Map &map_landmarks) {
 
   auto getWeightForObservation =
@@ -117,17 +118,15 @@ double ParticleFilter::getWeight(const Particle &particle,
             this->getLandmarkBestMatchingObs(obsInMapCoords, map_landmarks),
             std_landmark);};
 
-  std::vector<double> weights(observations.size());
-  return multiply(map2(observations, weights, getWeightForObservation));
+  return multiply(map2(observations, getWeightForObservation));
 }
 
-double ParticleFilter::multiply(std::vector<double> numbers) {
+double ParticleFilter::multiply(const vector<double> &numbers) {
   return accumulate(begin(numbers), end(numbers), 1.0, multiplies<double>());
 }
 
-std::vector<double> ParticleFilter::getWeightsOfParticles() {
-  std::vector<double> weights(particles.size());
-  return map2(particles, weights, [](Particle particle) {return particle.weight;});
+vector<double> ParticleFilter::getWeightsOfParticles() {
+  return map2(particles, [](Particle particle) {return particle.weight;});
 }
 
 void ParticleFilter::resample() {
@@ -135,12 +134,12 @@ void ParticleFilter::resample() {
   // NOTE: You may find std::discrete_distribution helpful here.
   //   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
 
-  std::vector<double> weights = getWeightsOfParticles();
-  std::discrete_distribution<int> weight_distribution(weights.begin(),
+  vector<double> weights = getWeightsOfParticles();
+  discrete_distribution<int> weight_distribution(weights.begin(),
                                                       weights.end());
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::vector<Particle> new_particles;
+  random_device rd;
+  mt19937 gen(rd());
+  vector<Particle> new_particles;
 
   for (int i = 0; i < num_particles; i++) {
     new_particles.push_back(particles[weight_distribution(gen)]);
@@ -159,7 +158,7 @@ LandmarkObs ParticleFilter::getLandmarkBestMatchingObs(
     const LandmarkObs &obs, const Map &map_landmarks) {
 
   Map::single_landmark_s min =
-      *std::min_element(
+      *min_element(
           map_landmarks.landmark_list.begin(),
           map_landmarks.landmark_list.end(),
           [obs](const Map::single_landmark_s &landmark1, const Map::single_landmark_s &landmark2)
