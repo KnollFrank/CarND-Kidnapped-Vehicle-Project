@@ -28,7 +28,6 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   // NOTE: Consult particle_filter.h for more information about this method (and others in this file).
 
   num_particles = 50;
-  normal_distribution<double> randn(0.0, 1.0);
 
   for (int i = 0; i < num_particles; i++) {
     Particle particle;
@@ -59,19 +58,24 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
   //  http://www.cplusplus.com/reference/random/default_random_engine/
 
   for (int i = 0; i < num_particles; i++) {
-    if (fabs(yaw_rate) < 0.0001) {
-      particles[i].x += velocity * delta_t * cos(particles[i].x);
-      particles[i].y += velocity * delta_t * sin(particles[i].x);
-    } else {
-      double new_theta = particles[i].theta + yaw_rate * delta_t;
-      particles[i].x += velocity / yaw_rate * (sin(new_theta) - sin(particles[i].theta));
-      particles[i].y += velocity / yaw_rate * (cos(particles[i].theta) - cos(new_theta));
-      particles[i].theta = new_theta;
-    }
-
-    normal_distribution<double> randn(0.0, 1.0);
-    addNoise(particles[i], std_pos);
+    predictParticle(particles[i], delta_t, std_pos, velocity, yaw_rate);
   }
+}
+
+void ParticleFilter::predictParticle(Particle &particle, double delta_t,
+                                     double std_pos[], double velocity,
+                                     double yaw_rate) {
+
+  if (fabs(yaw_rate) < 0.0001) {
+    particle.x += velocity * delta_t * cos(particle.x);
+    particle.y += velocity * delta_t * sin(particle.x);
+  } else {
+    double new_theta = particle.theta + yaw_rate * delta_t;
+    particle.x += velocity / yaw_rate * (sin(new_theta) - sin(particle.theta));
+    particle.y += velocity / yaw_rate * (cos(particle.theta) - cos(new_theta));
+    particle.theta = new_theta;
+  }
+  addNoise(particle, std_pos);
 }
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
