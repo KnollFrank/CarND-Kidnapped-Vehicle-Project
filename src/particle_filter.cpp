@@ -104,8 +104,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
       converted_obs = getObsInMapCoords(particles[i], observations[k]);
 
       //  2 - Assign observation to a landmark
-      best_landmark = associateLandmark(converted_obs, map_landmarks,
-                                        std_landmark);
+      best_landmark = associateLandmark(converted_obs, map_landmarks);
 
       //  3 - Calculate weight for the pair obs x best landmark
       double e = calculateWeights(converted_obs, best_landmark, std_landmark);
@@ -156,26 +155,22 @@ LandmarkObs ParticleFilter::getObsInMapCoords(const Particle &part,
 }
 
 LandmarkObs ParticleFilter::associateLandmark(const LandmarkObs &converted_obs,
-                                              const Map &map_landmarks,
-                                              double std_landmark[]) {
+                                              const Map &map_landmarks) {
+
+  Map::single_landmark_s min =
+      *std::min_element(
+          map_landmarks.landmark_list.begin(),
+          map_landmarks.landmark_list.end(),
+          [converted_obs](const Map::single_landmark_s &a, const Map::single_landmark_s &b)
+          {
+            double distance1 = dist(converted_obs.x, converted_obs.y, a.x_f, a.y_f);
+            double distance2 = dist(converted_obs.x, converted_obs.y, b.x_f, b.y_f);
+            return distance1 < distance2;
+          });
+
   LandmarkObs best_landmark;
-
-  for (int m = 0; m < int(map_landmarks.landmark_list.size()); m++) {
-    double min_dist;
-    double distance = dist(converted_obs.x, converted_obs.y,
-                           map_landmarks.landmark_list[m].x_f,
-                           map_landmarks.landmark_list[m].y_f);
-    if (m == 0) {
-      min_dist = distance;
-      best_landmark.x = map_landmarks.landmark_list[m].x_f;
-      best_landmark.y = map_landmarks.landmark_list[m].y_f;
-    } else if (distance < min_dist) {
-      min_dist = distance;
-      best_landmark.x = map_landmarks.landmark_list[m].x_f;
-      best_landmark.y = map_landmarks.landmark_list[m].y_f;
-    }
-  }
-
+  best_landmark.x = min.x_f;
+  best_landmark.y = min.y_f;
   return best_landmark;
 }
 

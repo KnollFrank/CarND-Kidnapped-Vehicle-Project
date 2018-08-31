@@ -98,11 +98,9 @@ class ParticleFilter {
    *   to a given observation point.
    * @param converted_obs landmark observation in map coordinates
    * @param map_landmarks map structure containing all known landmarks
-   * @param std_landmark noise array with uncertainties in measures on x and y
    */
   LandmarkObs associateLandmark(const LandmarkObs &converted_obs,
-                                const Map &map_landmarks,
-                                double std_landmark[]);
+                                const Map &map_landmarks);
 
   /**
    * calculateWeights uses a Multivariate-Gaussian Probability to assess the likelihood
