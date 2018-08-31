@@ -21,6 +21,13 @@ using namespace std;
 
 static default_random_engine gen;
 
+template<typename Collection, typename unop>
+vector<double> map2(Collection col, unop op) {
+  vector<double> result(col.size());
+  transform(col.begin(), col.end(), result.begin(), op);
+  return result;
+}
+
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
   // TODO: Set the number of particles. Initialize all particles to first position (based on estimates of
   //   x, y, theta and their uncertainties from GPS) and all weights to 1.
@@ -93,17 +100,10 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   //   3.33
   //   http://planning.cs.uiuc.edu/node99.html
 
-  for (int i = 0; i < particles.size(); i++) {
-    particles[i].weight = getWeight(particles[i], std_landmark, observations,
-                                    map_landmarks);
+  for (Particle &particle : particles) {
+    particle.weight = getWeight(particle, std_landmark, observations,
+                                map_landmarks);
   }
-}
-
-template<typename Collection, typename unop>
-vector<double> map2(Collection col, unop op) {
-  vector<double> result(col.size());
-  transform(col.begin(), col.end(), result.begin(), op);
-  return result;
 }
 
 double ParticleFilter::getWeight(const Particle &particle,
@@ -111,14 +111,24 @@ double ParticleFilter::getWeight(const Particle &particle,
                                  const vector<LandmarkObs> &observations,
                                  const Map &map_landmarks) {
 
-  auto getWeightForObservation =
-      [this, std_landmark, particle, map_landmarks](LandmarkObs observation) {
-        LandmarkObs obsInMapCoords = this->getObsInMapCoords(particle, observation);
-        return getWeight(obsInMapCoords,
-            this->getLandmarkBestMatchingObs(obsInMapCoords, map_landmarks),
-            std_landmark);};
+  vector<double> weightsForObservations = getWeightsForObservations(
+      particle, std_landmark, observations, map_landmarks);
+  return multiply(weightsForObservations);
+}
 
-  return multiply(map2(observations, getWeightForObservation));
+vector<double> ParticleFilter::getWeightsForObservations(
+    const Particle &particle, double std_landmark[],
+    const vector<LandmarkObs> &observations, const Map &map_landmarks) {
+
+  auto getWeightForObservation =
+      [&]
+      (const LandmarkObs &observation) {
+        LandmarkObs obsInMapCoords = getObsInMapCoords(particle, observation);
+        LandmarkObs best_landmark = getLandmarkBestMatchingObs(obsInMapCoords, map_landmarks);
+        return getWeight(obsInMapCoords, best_landmark, std_landmark);
+      };
+
+  return map2(observations, getWeightForObservation);
 }
 
 double ParticleFilter::multiply(const vector<double> &numbers) {
@@ -136,7 +146,7 @@ void ParticleFilter::resample() {
 
   vector<double> weights = getWeightsOfParticles();
   discrete_distribution<int> weight_distribution(weights.begin(),
-                                                      weights.end());
+                                                 weights.end());
   random_device rd;
   mt19937 gen(rd());
   vector<Particle> new_particles;
