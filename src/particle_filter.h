@@ -13,6 +13,7 @@
 
 struct Particle {
 
+  // TODO: brauchen wir die id?
   int id;
   double x;
   double y;
@@ -104,6 +105,7 @@ class ParticleFilter {
   double getWeight(const LandmarkObs &obs, const LandmarkObs &best_landmark,
                    double std_landmark[]);
   double gauss(double x, double mean, double stddev);
+  void addNoise(Particle &particle, double std_pos[]);
 
   std::string getAssociations(Particle best);
   std::string getSenseX(Particle best);

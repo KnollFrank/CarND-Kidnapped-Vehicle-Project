@@ -19,6 +19,8 @@
 
 using namespace std;
 
+static default_random_engine gen;
+
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
   // TODO: Set the number of particles. Initialize all particles to first position (based on estimates of
   //   x, y, theta and their uncertainties from GPS) and all weights to 1.
@@ -26,20 +28,27 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   // NOTE: Consult particle_filter.h for more information about this method (and others in this file).
 
   num_particles = 50;
-  default_random_engine gen;
   normal_distribution<double> randn(0.0, 1.0);
 
   for (int i = 0; i < num_particles; i++) {
     Particle particle;
     particle.id = i;
-    particle.x = x + randn(gen) * std[0];
-    particle.y = y + randn(gen) * std[1];
-    particle.theta = theta + randn(gen) * std[2];
+    particle.x = x;
+    particle.y = y;
+    particle.theta = theta;
     particle.weight = 1;
+    addNoise(particle, std);
     particles.push_back(particle);
   }
 
   is_initialized = true;
+}
+
+void ParticleFilter::addNoise(Particle &particle, double std[]) {
+  normal_distribution<double> randn(0.0, 1.0);
+  particle.x += randn(gen) * std[0];
+  particle.y += randn(gen) * std[1];
+  particle.theta += randn(gen) * std[2];
 }
 
 void ParticleFilter::prediction(double delta_t, double std_pos[],
@@ -49,30 +58,19 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
   //  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
   //  http://www.cplusplus.com/reference/random/default_random_engine/
 
-  default_random_engine gen;
-
-  double new_theta;
-  double new_x_mean;
-  double new_y_mean;
-
   for (int i = 0; i < num_particles; i++) {
     if (fabs(yaw_rate) < 0.0001) {
-      new_theta = particles[i].theta;
-      new_x_mean = particles[i].x + velocity * delta_t * cos(new_theta);
-      new_y_mean = particles[i].y + velocity * delta_t * sin(new_theta);
+      particles[i].x += velocity * delta_t * cos(particles[i].x);
+      particles[i].y += velocity * delta_t * sin(particles[i].x);
     } else {
-      new_theta = particles[i].theta + yaw_rate * delta_t;
-      new_x_mean = particles[i].x
-          + velocity / yaw_rate * (sin(new_theta) - sin(particles[i].theta));
-      new_y_mean = particles[i].y
-          + velocity / yaw_rate * (cos(particles[i].theta) - cos(new_theta));
+      double new_theta = particles[i].theta + yaw_rate * delta_t;
+      particles[i].x += velocity / yaw_rate * (sin(new_theta) - sin(particles[i].theta));
+      particles[i].y += velocity / yaw_rate * (cos(particles[i].theta) - cos(new_theta));
+      particles[i].theta = new_theta;
     }
 
     normal_distribution<double> randn(0.0, 1.0);
-
-    particles[i].x = new_x_mean + randn(gen) * std_pos[0];
-    particles[i].y = new_y_mean + randn(gen) * std_pos[1];
-    particles[i].theta = new_theta + randn(gen) * std_pos[2];
+    addNoise(particles[i], std_pos);
   }
 }
 
@@ -96,6 +94,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   for (int i = 0; i < particles.size(); i++) {
     double prob = 1.;
 
+    // TODO: extract inline method
     for (int k = 0; k < observations.size(); k++) {
       obsInMapCoords = getObsInMapCoords(particles[i], observations[k]);
       prob *= getWeight(
