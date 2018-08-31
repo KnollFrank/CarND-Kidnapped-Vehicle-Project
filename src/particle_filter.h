@@ -91,7 +91,7 @@ class ParticleFilter {
    */
   void resample();
 
-  LandmarkObs transformCoords(const Particle &part, const LandmarkObs &obs);
+  LandmarkObs getObsInMapCoords(const Particle &part, const LandmarkObs &obs);
 
   /**
    * associateLandmark uses a naive nearest neighbor algorithm to find the closest map landmark

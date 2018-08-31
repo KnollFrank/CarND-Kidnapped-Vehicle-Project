@@ -101,7 +101,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
     for (int k = 0; k < int(observations.size()); k++) {
       //  1 - For each particle convert measurements to map coordinate
-      converted_obs = transformCoords(particles[i], observations[k]);
+      converted_obs = getObsInMapCoords(particles[i], observations[k]);
 
       //  2 - Assign observation to a landmark
       best_landmark = associateLandmark(converted_obs, map_landmarks,
@@ -143,9 +143,8 @@ void ParticleFilter::resample() {
   particles = new_particles;
 }
 
-LandmarkObs ParticleFilter::transformCoords(const Particle &part,
-                                            const LandmarkObs &obs) {
-
+LandmarkObs ParticleFilter::getObsInMapCoords(const Particle &part,
+                                              const LandmarkObs &obs) {
   LandmarkObs transformed_coords;
 
   transformed_coords.id = obs.id;
