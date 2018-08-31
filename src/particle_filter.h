@@ -111,7 +111,8 @@ class ParticleFilter {
    * @param best_landmark best estimate of what landmark corresponds to the observed measurement
    * @param std_landmark noise array with uncertainties in measures on x and y
    */
-  double calculateWeights(LandmarkObs obs, LandmarkObs best_landmark,
+  double calculateWeights(const LandmarkObs &obs,
+                          const LandmarkObs &best_landmark,
                           double std_landmark[]);
 
   std::string getAssociations(Particle best);

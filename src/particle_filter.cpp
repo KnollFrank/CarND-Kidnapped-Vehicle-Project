@@ -183,8 +183,8 @@ LandmarkObs ParticleFilter::associateLandmark(const LandmarkObs &converted_obs,
   return best_landmark;
 }
 
-double ParticleFilter::calculateWeights(LandmarkObs obs,
-                                        LandmarkObs best_landmark,
+double ParticleFilter::calculateWeights(const LandmarkObs &obs,
+                                        const LandmarkObs &best_landmark,
                                         double std_landmark[]) {
 
   const double sigma_x = std_landmark[0];
