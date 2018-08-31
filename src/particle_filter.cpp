@@ -147,7 +147,6 @@ LandmarkObs ParticleFilter::getObsInMapCoords(const Particle &part,
                                               const LandmarkObs &obs) {
   LandmarkObs transformed_coords;
 
-  transformed_coords.id = obs.id;
   transformed_coords.x = obs.x * cos(part.theta) - obs.y * sin(part.theta)
       + part.x;
   transformed_coords.y = obs.x * sin(part.theta) + obs.y * cos(part.theta)
@@ -168,12 +167,10 @@ LandmarkObs ParticleFilter::associateLandmark(const LandmarkObs &converted_obs,
                            map_landmarks.landmark_list[m].y_f);
     if (m == 0) {
       min_dist = distance;
-      best_landmark.id = map_landmarks.landmark_list[m].id_i;
       best_landmark.x = map_landmarks.landmark_list[m].x_f;
       best_landmark.y = map_landmarks.landmark_list[m].y_f;
     } else if (distance < min_dist) {
       min_dist = distance;
-      best_landmark.id = map_landmarks.landmark_list[m].id_i;
       best_landmark.x = map_landmarks.landmark_list[m].x_f;
       best_landmark.y = map_landmarks.landmark_list[m].y_f;
     }
