@@ -143,7 +143,8 @@ void ParticleFilter::resample() {
   particles = new_particles;
 }
 
-LandmarkObs ParticleFilter::transformCoords(const Particle &part, const LandmarkObs &obs) {
+LandmarkObs ParticleFilter::transformCoords(const Particle &part,
+                                            const LandmarkObs &obs) {
 
   LandmarkObs transformed_coords;
 
@@ -156,8 +157,8 @@ LandmarkObs ParticleFilter::transformCoords(const Particle &part, const Landmark
   return transformed_coords;
 }
 
-LandmarkObs ParticleFilter::associateLandmark(LandmarkObs converted_obs,
-                                              Map map_landmarks,
+LandmarkObs ParticleFilter::associateLandmark(const LandmarkObs &converted_obs,
+                                              const Map &map_landmarks,
                                               double std_landmark[]) {
   LandmarkObs best_landmark;
 

@@ -100,7 +100,8 @@ class ParticleFilter {
    * @param map_landmarks map structure containing all known landmarks
    * @param std_landmark noise array with uncertainties in measures on x and y
    */
-  LandmarkObs associateLandmark(LandmarkObs converted_obs, Map map_landmarks,
+  LandmarkObs associateLandmark(const LandmarkObs &converted_obs,
+                                const Map &map_landmarks,
                                 double std_landmark[]);
 
   /**
