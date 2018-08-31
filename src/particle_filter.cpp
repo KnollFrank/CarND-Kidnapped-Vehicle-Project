@@ -119,18 +119,15 @@ void ParticleFilter::resample() {
   // NOTE: You may find std::discrete_distribution helpful here.
   //   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
 
-  std::vector<Particle> new_particles;
-  int index;
-
-  std::random_device rd;
-  std::mt19937 gen(rd());
   std::vector<double> weights = getWeightsOfParticles();
   std::discrete_distribution<int> weight_distribution(weights.begin(),
                                                       weights.end());
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::vector<Particle> new_particles;
 
   for (int i = 0; i < num_particles; i++) {
-    index = weight_distribution(gen);
-    new_particles.push_back(particles[index]);
+    new_particles.push_back(particles[weight_distribution(gen)]);
   }
   particles = new_particles;
 }
