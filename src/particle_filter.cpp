@@ -26,21 +26,16 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   // NOTE: Consult particle_filter.h for more information about this method (and others in this file).
 
   num_particles = 50;
-
   default_random_engine gen;
-
-  normal_distribution<double> dist_x(x, std[0]);
-  normal_distribution<double> dist_y(y, std[1]);
-  normal_distribution<double> dist_theta(theta, std[2]);
+  normal_distribution<double> randn(0.0, 1.0);
 
   for (int i = 0; i < num_particles; i++) {
     Particle particle;
     particle.id = i;
-    particle.x = dist_x(gen);
-    particle.y = dist_y(gen);
-    particle.theta = dist_theta(gen);
+    particle.x = x + randn(gen) * std[0];
+    particle.y = y + randn(gen) * std[1];
+    particle.theta = theta + randn(gen) * std[2];
     particle.weight = 1;
-
     particles.push_back(particle);
   }
 
@@ -73,13 +68,11 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
           + (velocity / yaw_rate) * (cos(particles[i].theta) - cos(new_theta));
     }
 
-    normal_distribution<double> dist_x(new_x_mean, std_pos[0]);
-    normal_distribution<double> dist_y(new_y_mean, std_pos[1]);
-    normal_distribution<double> dist_theta(new_theta, std_pos[2]);
+    normal_distribution<double> randn(0.0, 1.0);
 
-    particles[i].x = dist_x(gen);
-    particles[i].y = dist_y(gen);
-    particles[i].theta = dist_theta(gen);
+    particles[i].x = new_x_mean + randn(gen) * std_pos[0];
+    particles[i].y = new_y_mean + randn(gen) * std_pos[1];
+    particles[i].theta = new_theta + randn(gen) * std_pos[2];
   }
 }
 
