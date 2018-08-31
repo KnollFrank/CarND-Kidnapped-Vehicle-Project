@@ -92,9 +92,6 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   //   http://planning.cs.uiuc.edu/node99.html
 
   LandmarkObs obsInMapCoords;
-  LandmarkObs landmark;
-
-  weights.clear();
 
   for (int i = 0; i < particles.size(); i++) {
     double prob = 1.;
@@ -106,13 +103,15 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
           getLandmarkBestMatchingObs(obsInMapCoords, map_landmarks),
           std_landmark);
     }
-
-    // store weight in particle
     particles[i].weight = prob;
-
-    // and in the weights vector
-    weights.push_back(prob);
   }
+}
+
+std::vector<double> ParticleFilter::getWeightsOfParticles() {
+  std::vector<double> weights(particles.size());
+  std::transform(particles.begin(), particles.end(), weights.begin(),
+                 [](Particle particle) {return particle.weight;});
+  return weights;
 }
 
 void ParticleFilter::resample() {
@@ -125,6 +124,7 @@ void ParticleFilter::resample() {
 
   std::random_device rd;
   std::mt19937 gen(rd());
+  std::vector<double> weights = getWeightsOfParticles();
   std::discrete_distribution<int> weight_distribution(weights.begin(),
                                                       weights.end());
 
@@ -168,6 +168,7 @@ double ParticleFilter::gauss(double x, double mean, double stddev) {
 double ParticleFilter::getWeight(const LandmarkObs &obs,
                                  const LandmarkObs &best_landmark,
                                  double std_landmark[]) {
+
   return gauss(obs.x, best_landmark.x, std_landmark[0])
       * gauss(obs.y, best_landmark.y, std_landmark[1]);
 }

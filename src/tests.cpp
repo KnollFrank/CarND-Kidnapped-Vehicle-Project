@@ -22,10 +22,10 @@ TEST(ParticleFilterTest, ShouldInit) {
     EXPECT_NEAR(theta, pf.particles[i].theta, 3*sigma_pos[2]) << "particles.theta at index " << i;
   }
 
-  ASSERT_EQ(pf.particles.size(), pf.weights.size());
-  for (int i = 0; i < pf.weights.size(); ++i) {
-    EXPECT_EQ(1, pf.weights[i]) << "weights should be 1 at index " << i;
-  }
+//  ASSERT_EQ(pf.particles.size(), pf.weights.size());
+//  for (int i = 0; i < pf.weights.size(); ++i) {
+//    EXPECT_EQ(1, pf.weights[i]) << "weights should be 1 at index " << i;
+//  }
 
   ASSERT_TRUE(pf.initialized());
 }
