@@ -94,7 +94,8 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   //   http://planning.cs.uiuc.edu/node99.html
 
   for (int i = 0; i < particles.size(); i++) {
-    particles[i].weight = getWeight(particles[i], std_landmark, observations, map_landmarks);
+    particles[i].weight = getWeight(particles[i], std_landmark, observations,
+                                    map_landmarks);
   }
 }
 
@@ -102,18 +103,27 @@ double ParticleFilter::getWeight(const Particle &particle,
                                  double std_landmark[],
                                  const std::vector<LandmarkObs> &observations,
                                  const Map &map_landmarks) {
-  // TODO: transform to functional style
-  double prob = 1.;
-  for (int k = 0; k < observations.size(); k++) {
-    LandmarkObs obsInMapCoords = getObsInMapCoords(particle, observations[k]);
-    prob *= getWeight(obsInMapCoords,
-                      getLandmarkBestMatchingObs(obsInMapCoords, map_landmarks),
-                      std_landmark);
-  }
-  return prob;
+
+  auto getWeightForObservation =
+      [this, std_landmark, particle, map_landmarks](LandmarkObs observation) {
+        LandmarkObs obsInMapCoords = this->getObsInMapCoords(particle, observation);
+        return getWeight(obsInMapCoords,
+            this->getLandmarkBestMatchingObs(obsInMapCoords, map_landmarks),
+            std_landmark);};
+
+  std::vector<double> weights(observations.size());
+  std::transform(observations.begin(), observations.end(), weights.begin(),
+                 getWeightForObservation);
+
+  return multiply(weights);
+}
+
+double ParticleFilter::multiply(std::vector<double> numbers) {
+  return accumulate(begin(numbers), end(numbers), 1.0, multiplies<double>());
 }
 
 std::vector<double> ParticleFilter::getWeightsOfParticles() {
+  // TODO: DRY, refactor to map
   std::vector<double> weights(particles.size());
   std::transform(particles.begin(), particles.end(), weights.begin(),
                  [](Particle particle) {return particle.weight;});
