@@ -93,14 +93,12 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   //   3.33
   //   http://planning.cs.uiuc.edu/node99.html
 
-  LandmarkObs obsInMapCoords;
-
   for (int i = 0; i < particles.size(); i++) {
     double prob = 1.;
 
     // TODO: extract inline method
     for (int k = 0; k < observations.size(); k++) {
-      obsInMapCoords = getObsInMapCoords(particles[i], observations[k]);
+      LandmarkObs obsInMapCoords = getObsInMapCoords(particles[i], observations[k]);
       prob *= getWeight(
           obsInMapCoords,
           getLandmarkBestMatchingObs(obsInMapCoords, map_landmarks),
