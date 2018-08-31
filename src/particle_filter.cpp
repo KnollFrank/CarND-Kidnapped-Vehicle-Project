@@ -143,7 +143,7 @@ void ParticleFilter::resample() {
   particles = new_particles;
 }
 
-LandmarkObs ParticleFilter::transformCoords(Particle part, LandmarkObs obs) {
+LandmarkObs ParticleFilter::transformCoords(const Particle &part, const LandmarkObs &obs) {
 
   LandmarkObs transformed_coords;
 
