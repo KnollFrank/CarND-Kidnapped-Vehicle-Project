@@ -99,6 +99,12 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   }
 }
 
+template<typename Collection, typename Collection2, typename unop>
+Collection2 map2(Collection col, Collection2 result, unop op) {
+  std::transform(col.begin(), col.end(), result.begin(), op);
+  return result;
+}
+
 double ParticleFilter::getWeight(const Particle &particle,
                                  double std_landmark[],
                                  const std::vector<LandmarkObs> &observations,
@@ -112,10 +118,7 @@ double ParticleFilter::getWeight(const Particle &particle,
             std_landmark);};
 
   std::vector<double> weights(observations.size());
-  std::transform(observations.begin(), observations.end(), weights.begin(),
-                 getWeightForObservation);
-
-  return multiply(weights);
+  return multiply(map2(observations, weights, getWeightForObservation));
 }
 
 double ParticleFilter::multiply(std::vector<double> numbers) {
@@ -123,11 +126,8 @@ double ParticleFilter::multiply(std::vector<double> numbers) {
 }
 
 std::vector<double> ParticleFilter::getWeightsOfParticles() {
-  // TODO: DRY, refactor to map
   std::vector<double> weights(particles.size());
-  std::transform(particles.begin(), particles.end(), weights.begin(),
-                 [](Particle particle) {return particle.weight;});
-  return weights;
+  return map2(particles, weights, [](Particle particle) {return particle.weight;});
 }
 
 void ParticleFilter::resample() {
