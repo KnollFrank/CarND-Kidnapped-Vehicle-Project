@@ -107,6 +107,11 @@ class ParticleFilter {
    */
   double getWeight(const LandmarkObs &obs, const LandmarkObs &best_landmark,
                    double std_landmark[]);
+
+  double getWeight(const Particle &particle, double std_landmark[],
+                   const std::vector<LandmarkObs> &observations,
+                   const Map &map_landmarks);
+
   double gauss(double x, double mean, double stddev);
   void addNoise(Particle &particle, double std_pos[]);
 

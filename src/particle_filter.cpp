@@ -94,18 +94,23 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   //   http://planning.cs.uiuc.edu/node99.html
 
   for (int i = 0; i < particles.size(); i++) {
-    double prob = 1.;
-
-    // TODO: extract inline method
-    for (int k = 0; k < observations.size(); k++) {
-      LandmarkObs obsInMapCoords = getObsInMapCoords(particles[i], observations[k]);
-      prob *= getWeight(
-          obsInMapCoords,
-          getLandmarkBestMatchingObs(obsInMapCoords, map_landmarks),
-          std_landmark);
-    }
-    particles[i].weight = prob;
+    particles[i].weight = getWeight(particles[i], std_landmark, observations, map_landmarks);
   }
+}
+
+double ParticleFilter::getWeight(const Particle &particle,
+                                 double std_landmark[],
+                                 const std::vector<LandmarkObs> &observations,
+                                 const Map &map_landmarks) {
+  // TODO: transform to functional style
+  double prob = 1.;
+  for (int k = 0; k < observations.size(); k++) {
+    LandmarkObs obsInMapCoords = getObsInMapCoords(particle, observations[k]);
+    prob *= getWeight(obsInMapCoords,
+                      getLandmarkBestMatchingObs(obsInMapCoords, map_landmarks),
+                      std_landmark);
+  }
+  return prob;
 }
 
 std::vector<double> ParticleFilter::getWeightsOfParticles() {
