@@ -64,8 +64,8 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
   //  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
   //  http://www.cplusplus.com/reference/random/default_random_engine/
 
-  for (int i = 0; i < num_particles; i++) {
-    predictParticle(particles[i], delta_t, std_pos, velocity, yaw_rate);
+  for (Particle &particle : particles) {
+    predictParticle(particle, delta_t, std_pos, velocity, yaw_rate);
   }
 }
 
