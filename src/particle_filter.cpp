@@ -141,14 +141,9 @@ void ParticleFilter::resample() {
 
 LandmarkObs ParticleFilter::getObsInMapCoords(const Particle &part,
                                               const LandmarkObs &obs) {
-  LandmarkObs transformed_coords;
-
-  transformed_coords.x = obs.x * cos(part.theta) - obs.y * sin(part.theta)
-      + part.x;
-  transformed_coords.y = obs.x * sin(part.theta) + obs.y * cos(part.theta)
-      + part.y;
-
-  return transformed_coords;
+  double x = part.x + obs.x * cos(part.theta) - obs.y * sin(part.theta);
+  double y = part.y + obs.x * sin(part.theta) + obs.y * cos(part.theta);
+  return LandmarkObs { x, y };
 }
 
 LandmarkObs ParticleFilter::associateObsWithLandmark(const LandmarkObs &obs,
