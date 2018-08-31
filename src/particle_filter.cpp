@@ -58,14 +58,14 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
   for (int i = 0; i < num_particles; i++) {
     if (fabs(yaw_rate) < 0.0001) {
       new_theta = particles[i].theta;
-      new_x_mean = particles[i].x + (velocity * delta_t * cos(new_theta));
-      new_y_mean = particles[i].y + (velocity * delta_t * sin(new_theta));
+      new_x_mean = particles[i].x + velocity * delta_t * cos(new_theta);
+      new_y_mean = particles[i].y + velocity * delta_t * sin(new_theta);
     } else {
       new_theta = particles[i].theta + yaw_rate * delta_t;
       new_x_mean = particles[i].x
-          + (velocity / yaw_rate) * (sin(new_theta) - sin(particles[i].theta));
+          + velocity / yaw_rate * (sin(new_theta) - sin(particles[i].theta));
       new_y_mean = particles[i].y
-          + (velocity / yaw_rate) * (cos(particles[i].theta) - cos(new_theta));
+          + velocity / yaw_rate * (cos(particles[i].theta) - cos(new_theta));
     }
 
     normal_distribution<double> randn(0.0, 1.0);
