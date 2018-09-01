@@ -80,9 +80,16 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
                                    const Map &map_landmarks) {
 
   for (Particle &particle : particles) {
-    particle.weight = getWeight(particle, std_landmark, observations,
-                                map_landmarks);
+    updateWeight(particle, std_landmark, observations, map_landmarks);
   }
+}
+
+void ParticleFilter::updateWeight(Particle &particle,
+                                  double std_landmark[],
+                                  const vector<LandmarkObs> &observations,
+                                  const Map &map_landmarks) {
+
+  particle.weight = getWeight(particle, std_landmark, observations, map_landmarks);
 }
 
 double ParticleFilter::getWeight(const Particle &particle,
