@@ -63,15 +63,28 @@ void ParticleFilter::predictParticle(Particle &particle, double delta_t,
                                      double yaw_rate) {
 
   if (fabs(yaw_rate) < 0.0001) {
-    particle.x += velocity * delta_t * cos(particle.x);
-    particle.y += velocity * delta_t * sin(particle.x);
+    predictParticleIgnoringYawrate(particle, delta_t, velocity);
   } else {
-    double new_theta = particle.theta + yaw_rate * delta_t;
-    particle.x += velocity / yaw_rate * (sin(new_theta) - sin(particle.theta));
-    particle.y += velocity / yaw_rate * (cos(particle.theta) - cos(new_theta));
-    particle.theta = new_theta;
+    predictParticleUsingYawrate(particle, delta_t, velocity, yaw_rate);
   }
   addNoise(particle, std_pos);
+}
+
+void ParticleFilter::predictParticleIgnoringYawrate(Particle &particle,
+                                                     double delta_t,
+                                                     double velocity) {
+  particle.x += velocity * delta_t * cos(particle.x);
+  particle.y += velocity * delta_t * sin(particle.x);
+}
+
+void ParticleFilter::predictParticleUsingYawrate(Particle &particle,
+                                                  double delta_t,
+                                                  double velocity,
+                                                  double yaw_rate) {
+  double new_theta = particle.theta + yaw_rate * delta_t;
+  particle.x += velocity / yaw_rate * (sin(new_theta) - sin(particle.theta));
+  particle.y += velocity / yaw_rate * (cos(particle.theta) - cos(new_theta));
+  particle.theta = new_theta;
 }
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],

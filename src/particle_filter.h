@@ -72,6 +72,11 @@ class ParticleFilter {
   void predictParticle(Particle &particle, double delta_t, double std_pos[],
                        double velocity, double yaw_rate);
 
+  void predictParticleIgnoringYawrate(Particle &particle, double delta_t,
+                                      double velocity);
+
+  void predictParticleUsingYawrate(Particle &particle, double delta_t,
+                                   double velocity, double yaw_rate);
   /**
    * updateWeights Updates the weights for each particle based on the likelihood of the
    *   observed measurements.
