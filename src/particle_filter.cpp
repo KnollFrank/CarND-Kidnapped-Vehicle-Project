@@ -122,9 +122,6 @@ void ParticleFilter::resample() {
   vector<double> weights = getWeightsOfParticles();
   discrete_distribution<int> weight_distribution(weights.begin(),
                                                  weights.end());
-  // TODO: verwende default_random_engine gen statt mt19937
-  random_device rd;
-  mt19937 gen(rd());
   vector<Particle> new_particles;
 
   for (int i = 0; i < num_particles; i++) {
