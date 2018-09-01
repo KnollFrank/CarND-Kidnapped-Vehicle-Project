@@ -1,7 +1,6 @@
 project(PARTICLE_FILTER_ECLIPSE)
 
 cmake_minimum_required (VERSION 3.5)
-find_package(GTest REQUIRED)
 
 add_definitions(-std=c++11)
 
@@ -15,7 +14,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 include_directories(/usr/local/include)
 include_directories(/usr/local/opt/openssl/include)
-include_directories(${GTEST_INCLUDE_DIRS})
 link_directories(/usr/local/lib)
 link_directories(/usr/local/opt/openssl/lib)
 link_directories(/usr/local/Cellar/libuv/1*/lib)
@@ -26,4 +24,4 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 add_executable(particle_filter ${sources})
 
 
-target_link_libraries(particle_filter z ssl uv uWS ${GTEST_LIBRARIES} pthread)
+target_link_libraries(particle_filter z ssl uv uWS)
