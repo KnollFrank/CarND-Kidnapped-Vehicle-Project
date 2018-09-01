@@ -29,11 +29,6 @@ vector<double> map2(Collection col, unop op) {
 }
 
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
-  // TODO: Set the number of particles. Initialize all particles to first position (based on estimates of
-  //   x, y, theta and their uncertainties from GPS) and all weights to 1.
-  // Add random Gaussian noise to each particle.
-  // NOTE: Consult particle_filter.h for more information about this method (and others in this file).
-
   num_particles = 50;
 
   for (int i = 0; i < num_particles; i++) {
@@ -59,11 +54,6 @@ void ParticleFilter::addNoise(Particle &particle, double std[]) {
 
 void ParticleFilter::prediction(double delta_t, double std_pos[],
                                 double velocity, double yaw_rate) {
-  // TODO: Add measurements to each particle and add random Gaussian noise.
-  // NOTE: When adding noise you may find std::normal_distribution and std::default_random_engine useful.
-  //  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
-  //  http://www.cplusplus.com/reference/random/default_random_engine/
-
   for (Particle &particle : particles) {
     predictParticle(particle, delta_t, std_pos, velocity, yaw_rate);
   }
@@ -88,17 +78,6 @@ void ParticleFilter::predictParticle(Particle &particle, double delta_t,
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
                                    const vector<LandmarkObs> &observations,
                                    const Map &map_landmarks) {
-
-  // TODO: Update the weights of each particle using a mult-variate Gaussian distribution. You can read
-  //   more about this distribution here: https://en.wikipedia.org/wiki/Multivariate_normal_distribution
-  // NOTE: The observations are given in the VEHICLE'S coordinate system. Your particles are located
-  //   according to the MAP'S coordinate system. You will need to transform between the two systems.
-  //   Keep in mind that this transformation requires both rotation AND translation (but no scaling).
-  //   The following is a good resource for the theory:
-  //   https://www.willamette.edu/~gorr/classes/GeneralGraphics/Transforms/transforms2d.htm
-  //   and the following is a good resource for the actual equation to implement (look at equation
-  //   3.33
-  //   http://planning.cs.uiuc.edu/node99.html
 
   for (Particle &particle : particles) {
     particle.weight = getWeight(particle, std_landmark, observations,
@@ -140,13 +119,10 @@ vector<double> ParticleFilter::getWeightsOfParticles() {
 }
 
 void ParticleFilter::resample() {
-  // TODO: Resample particles with replacement with probability proportional to their weight.
-  // NOTE: You may find std::discrete_distribution helpful here.
-  //   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
-
   vector<double> weights = getWeightsOfParticles();
   discrete_distribution<int> weight_distribution(weights.begin(),
                                                  weights.end());
+  // TODO: verwende default_random_engine gen statt mt19937
   random_device rd;
   mt19937 gen(rd());
   vector<Particle> new_particles;
