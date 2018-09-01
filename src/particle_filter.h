@@ -13,8 +13,6 @@
 
 struct Particle {
 
-  // TODO: brauchen wir die id?
-  int id;
   double x;
   double y;
   double theta;
