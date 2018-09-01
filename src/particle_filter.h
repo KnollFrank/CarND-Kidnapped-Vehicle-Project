@@ -91,6 +91,7 @@ class ParticleFilter {
    *   the new set of particles.
    */
   void resample();
+
   std::vector<double> getWeightsOfParticles();
 
   LandmarkObs getObsInMapCoords(const Particle &part, const LandmarkObs &obs);
@@ -98,29 +99,27 @@ class ParticleFilter {
   LandmarkObs getLandmarkBestMatchingObs(const LandmarkObs &converted_obs,
                                          const Map &map_landmarks);
 
-  /**
-   * calculateWeights uses a Multivariate-Gaussian Probability to assess the likelihood
-   *  of an observation matching a map landmark.
-   * @param obs landmark observation in map coordinates
-   * @param best_landmark best estimate of what landmark corresponds to the observed measurement
-   * @param std_landmark noise array with uncertainties in measures on x and y
-   */
   double getWeight(const LandmarkObs &obs, const LandmarkObs &best_landmark,
                    double std_landmark[]);
 
   double getWeight(const Particle &particle, double std_landmark[],
                    const std::vector<LandmarkObs> &observations,
                    const Map &map_landmarks);
+
   std::vector<double> getWeightsForObservations(
       const Particle &particle, double std_landmark[],
       const std::vector<LandmarkObs> &observations, const Map &map_landmarks);
 
   double gauss(double x, double mean, double stddev);
+
   void addNoise(Particle &particle, double std_pos[]);
+
   double multiply(const std::vector<double> &numbers);
 
   std::string getAssociations(Particle best);
+
   std::string getSenseX(Particle best);
+
   std::string getSenseY(Particle best);
 
   /**
