@@ -84,12 +84,12 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   }
 }
 
-void ParticleFilter::updateWeight(Particle &particle,
-                                  double std_landmark[],
+void ParticleFilter::updateWeight(Particle &particle, double std_landmark[],
                                   const vector<LandmarkObs> &observations,
                                   const Map &map_landmarks) {
 
-  particle.weight = getWeight(particle, std_landmark, observations, map_landmarks);
+  particle.weight = getWeight(particle, std_landmark, observations,
+                              map_landmarks);
 }
 
 double ParticleFilter::getWeight(const Particle &particle,
@@ -147,16 +147,15 @@ LandmarkObs ParticleFilter::getObsInMapCoords(const Particle &part,
 LandmarkObs ParticleFilter::getLandmarkBestMatchingObs(
     const LandmarkObs &obs, const Map &map_landmarks) {
 
-  Map::single_landmark_s min =
-      *min_element(
-          map_landmarks.landmark_list.begin(),
-          map_landmarks.landmark_list.end(),
-          [obs](const Map::single_landmark_s &landmark1, const Map::single_landmark_s &landmark2)
-          {
-            double distance1 = dist(obs.x, obs.y, landmark1.x_f, landmark1.y_f);
-            double distance2 = dist(obs.x, obs.y, landmark2.x_f, landmark2.y_f);
-            return distance1 < distance2;
-          });
+  auto isCloserToObs =
+      [obs](const Map::single_landmark_s& landmark1, const Map::single_landmark_s& landmark2) {
+        double distance1 = dist(obs.x, obs.y, landmark1.x_f, landmark1.y_f);
+        double distance2 = dist(obs.x, obs.y, landmark2.x_f, landmark2.y_f);
+        return distance1 < distance2;
+      };
+  Map::single_landmark_s min = *min_element(map_landmarks.landmark_list.begin(),
+                                            map_landmarks.landmark_list.end(),
+                                            isCloserToObs);
 
   return LandmarkObs { min.x_f, min.y_f };
 }
