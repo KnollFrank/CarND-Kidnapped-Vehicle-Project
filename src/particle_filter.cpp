@@ -160,7 +160,7 @@ LandmarkObs ParticleFilter::getLandmarkBestMatchingObs(
     const LandmarkObs &obs, const Map &map_landmarks) {
 
   auto isCloserToObs =
-      [obs](const Map::single_landmark_s& landmark1, const Map::single_landmark_s& landmark2) {
+      [&obs](const Map::single_landmark_s& landmark1, const Map::single_landmark_s& landmark2) {
         double distance1 = dist(obs.x, obs.y, landmark1.x_f, landmark1.y_f);
         double distance2 = dist(obs.x, obs.y, landmark2.x_f, landmark2.y_f);
         return distance1 < distance2;
