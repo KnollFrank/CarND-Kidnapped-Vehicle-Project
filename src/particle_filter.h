@@ -69,13 +69,13 @@ class ParticleFilter {
   void prediction(double delta_t, double std_pos[], double velocity,
                   double yaw_rate);
 
-  void predictParticle(Particle &particle, double delta_t, double std_pos[],
+  void predictParticle(Particle& particle, double delta_t, double std_pos[],
                        double velocity, double yaw_rate);
 
-  void predictParticleIgnoringYawrate(Particle &particle, double delta_t,
+  void predictParticleIgnoringYawrate(Particle& particle, double delta_t,
                                       double velocity);
 
-  void predictParticleUsingYawrate(Particle &particle, double delta_t,
+  void predictParticleUsingYawrate(Particle& particle, double delta_t,
                                    double velocity, double yaw_rate);
   /**
    * updateWeights Updates the weights for each particle based on the likelihood of the
@@ -86,15 +86,15 @@ class ParticleFilter {
    * @param map Map class containing map landmarks
    */
   void updateWeights(double sensor_range, double std_landmark[],
-                     const std::vector<LandmarkObs> &observations,
-                     const Map &map_landmarks);
+                     const std::vector<LandmarkObs>& observations,
+                     const Map& map_landmarks);
 
-  void updateWeight(Particle &particle, double std_landmark[],
-                    const std::vector<LandmarkObs> &observations,
-                    const Map &map_landmarks);
+  void updateWeight(Particle& particle, double std_landmark[],
+                    const std::vector<LandmarkObs>& observations,
+                    const Map& map_landmarks);
 
   std::vector<LandmarkObs> getObservationsWithinSensorRange(
-      double sensor_range, const std::vector<LandmarkObs> &observations);
+      double sensor_range, const std::vector<LandmarkObs>& observations);
 
   /**
    * resample Resamples from the updated set of particles to form
@@ -104,27 +104,27 @@ class ParticleFilter {
 
   std::vector<double> getWeightsOfParticles();
 
-  LandmarkObs getObsInMapCoords(const Particle &part, const LandmarkObs &obs);
+  LandmarkObs getObsInMapCoords(const Particle& part, const LandmarkObs& obs);
 
-  LandmarkObs getLandmarkBestMatchingObs(const LandmarkObs &converted_obs,
-                                         const Map &map_landmarks);
+  LandmarkObs getLandmarkBestMatchingObs(const LandmarkObs& converted_obs,
+                                         const Map& map_landmarks);
 
-  double getWeight(const LandmarkObs &obs, const LandmarkObs &best_landmark,
+  double getWeight(const LandmarkObs& obs, const LandmarkObs& best_landmark,
                    double std_landmark[]);
 
-  double getWeight(const Particle &particle, double std_landmark[],
-                   const std::vector<LandmarkObs> &observations,
-                   const Map &map_landmarks);
+  double getWeight(const Particle& particle, double std_landmark[],
+                   const std::vector<LandmarkObs>& observations,
+                   const Map& map_landmarks);
 
   std::vector<double> getWeightsForObservations(
-      const Particle &particle, double std_landmark[],
-      const std::vector<LandmarkObs> &observations, const Map &map_landmarks);
+      const Particle& particle, double std_landmark[],
+      const std::vector<LandmarkObs>& observations, const Map& map_landmarks);
 
   double gauss(double x, double mean, double stddev);
 
-  void addNoise(Particle &particle, double std_pos[]);
+  void addNoise(Particle& particle, double std_pos[]);
 
-  double multiply(const std::vector<double> &numbers);
+  double multiply(const std::vector<double>& numbers);
 
   std::string getAssociations(Particle best);
 

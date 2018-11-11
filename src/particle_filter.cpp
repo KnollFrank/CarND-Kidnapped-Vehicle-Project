@@ -22,9 +22,8 @@ using namespace std;
 
 static default_random_engine gen;
 
-// TODO: alle Referenzen neu formatieren
 template<typename T, typename R, typename unop>
-vector<R> map2(const vector<T> &v, unop op) {
+vector<R> map2(const vector<T>& v, unop op) {
   vector<R> result(v.size());
   transform(v.begin(), v.end(), result.begin(), op);
   return result;
@@ -54,7 +53,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   is_initialized = true;
 }
 
-void ParticleFilter::addNoise(Particle &particle, double std[]) {
+void ParticleFilter::addNoise(Particle& particle, double std[]) {
   normal_distribution<double> randn(0.0, 1.0);
   particle.x += randn(gen) * std[0];
   particle.y += randn(gen) * std[1];
@@ -63,12 +62,12 @@ void ParticleFilter::addNoise(Particle &particle, double std[]) {
 
 void ParticleFilter::prediction(double delta_t, double std_pos[],
                                 double velocity, double yaw_rate) {
-  for (Particle &particle : particles) {
+  for (Particle& particle : particles) {
     predictParticle(particle, delta_t, std_pos, velocity, yaw_rate);
   }
 }
 
-void ParticleFilter::predictParticle(Particle &particle, double delta_t,
+void ParticleFilter::predictParticle(Particle& particle, double delta_t,
                                      double std_pos[], double velocity,
                                      double yaw_rate) {
 
@@ -80,14 +79,14 @@ void ParticleFilter::predictParticle(Particle &particle, double delta_t,
   addNoise(particle, std_pos);
 }
 
-void ParticleFilter::predictParticleIgnoringYawrate(Particle &particle,
+void ParticleFilter::predictParticleIgnoringYawrate(Particle& particle,
                                                     double delta_t,
                                                     double velocity) {
   particle.x += velocity * delta_t * cos(particle.x);
   particle.y += velocity * delta_t * sin(particle.x);
 }
 
-void ParticleFilter::predictParticleUsingYawrate(Particle &particle,
+void ParticleFilter::predictParticleUsingYawrate(Particle& particle,
                                                  double delta_t,
                                                  double velocity,
                                                  double yaw_rate) {
@@ -98,20 +97,20 @@ void ParticleFilter::predictParticleUsingYawrate(Particle &particle,
 }
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
-                                   const vector<LandmarkObs> &observations,
-                                   const Map &map_landmarks) {
+                                   const vector<LandmarkObs>& observations,
+                                   const Map& map_landmarks) {
 
   const vector<LandmarkObs>& observationsWithinSensorRange =
       getObservationsWithinSensorRange(sensor_range, observations);
 
-  for (Particle &particle : particles) {
+  for (Particle& particle : particles) {
     updateWeight(particle, std_landmark, observationsWithinSensorRange,
                  map_landmarks);
   }
 }
 
 vector<LandmarkObs> ParticleFilter::getObservationsWithinSensorRange(
-    double sensor_range, const vector<LandmarkObs> &observations) {
+    double sensor_range, const vector<LandmarkObs>& observations) {
 
   auto isObservationWithinSensorRange = [&](const LandmarkObs& obs) {
     return dist(obs.x, obs.y, 0, 0) <= sensor_range;
@@ -120,18 +119,18 @@ vector<LandmarkObs> ParticleFilter::getObservationsWithinSensorRange(
   return filter<LandmarkObs>(observations, isObservationWithinSensorRange);
 }
 
-void ParticleFilter::updateWeight(Particle &particle, double std_landmark[],
-                                  const vector<LandmarkObs> &observations,
-                                  const Map &map_landmarks) {
+void ParticleFilter::updateWeight(Particle& particle, double std_landmark[],
+                                  const vector<LandmarkObs>& observations,
+                                  const Map& map_landmarks) {
 
   particle.weight = getWeight(particle, std_landmark, observations,
                               map_landmarks);
 }
 
-double ParticleFilter::getWeight(const Particle &particle,
+double ParticleFilter::getWeight(const Particle& particle,
                                  double std_landmark[],
-                                 const vector<LandmarkObs> &observations,
-                                 const Map &map_landmarks) {
+                                 const vector<LandmarkObs>& observations,
+                                 const Map& map_landmarks) {
 
   vector<double> weightsForObservations = getWeightsForObservations(
       particle, std_landmark, observations, map_landmarks);
@@ -139,12 +138,12 @@ double ParticleFilter::getWeight(const Particle &particle,
 }
 
 vector<double> ParticleFilter::getWeightsForObservations(
-    const Particle &particle, double std_landmark[],
-    const vector<LandmarkObs> &observations, const Map &map_landmarks) {
+    const Particle& particle, double std_landmark[],
+    const vector<LandmarkObs>& observations, const Map& map_landmarks) {
 
   auto getWeightForObservation =
       [&]
-      (const LandmarkObs &observation) {
+      (const LandmarkObs& observation) {
         LandmarkObs obsInMapCoords = getObsInMapCoords(particle, observation);
         LandmarkObs best_landmark = getLandmarkBestMatchingObs(obsInMapCoords, map_landmarks);
         return getWeight(obsInMapCoords, best_landmark, std_landmark);
@@ -153,7 +152,7 @@ vector<double> ParticleFilter::getWeightsForObservations(
   return map2<LandmarkObs, double>(observations, getWeightForObservation);
 }
 
-double ParticleFilter::multiply(const vector<double> &numbers) {
+double ParticleFilter::multiply(const vector<double>& numbers) {
   return accumulate(begin(numbers), end(numbers), 1.0, multiplies<double>());
 }
 
@@ -174,15 +173,15 @@ void ParticleFilter::resample() {
   particles = new_particles;
 }
 
-LandmarkObs ParticleFilter::getObsInMapCoords(const Particle &part,
-                                              const LandmarkObs &obs) {
+LandmarkObs ParticleFilter::getObsInMapCoords(const Particle& part,
+                                              const LandmarkObs& obs) {
   double x = part.x + obs.x * cos(part.theta) - obs.y * sin(part.theta);
   double y = part.y + obs.x * sin(part.theta) + obs.y * cos(part.theta);
   return LandmarkObs { x, y };
 }
 
 LandmarkObs ParticleFilter::getLandmarkBestMatchingObs(
-    const LandmarkObs &obs, const Map &map_landmarks) {
+    const LandmarkObs& obs, const Map& map_landmarks) {
 
   auto isCloserToObs =
       [&obs](const Map::single_landmark_s& landmark1, const Map::single_landmark_s& landmark2) {
@@ -203,8 +202,8 @@ double ParticleFilter::gauss(double x, double mean, double stddev) {
   return 1.0 / (stddev * sqrt(2.0 * M_PI)) * exp(-dx * dx / (2.0 * var));
 }
 
-double ParticleFilter::getWeight(const LandmarkObs &obs,
-                                 const LandmarkObs &best_landmark,
+double ParticleFilter::getWeight(const LandmarkObs& obs,
+                                 const LandmarkObs& best_landmark,
                                  double std_landmark[]) {
 
   return gauss(obs.x, best_landmark.x, std_landmark[0])
