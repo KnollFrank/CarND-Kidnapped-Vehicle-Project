@@ -21,10 +21,11 @@ using namespace std;
 
 static default_random_engine gen;
 
-template<typename Collection, typename unop>
-vector<double> map2(Collection col, unop op) {
-  vector<double> result(col.size());
-  transform(col.begin(), col.end(), result.begin(), op);
+// TODO: alle Referenzen neu formatieren
+template<typename T, typename R, typename unop>
+vector<R> map2(const vector<T> &v, unop op) {
+  vector<R> result(v.size());
+  transform(v.begin(), v.end(), result.begin(), op);
   return result;
 }
 
@@ -71,16 +72,16 @@ void ParticleFilter::predictParticle(Particle &particle, double delta_t,
 }
 
 void ParticleFilter::predictParticleIgnoringYawrate(Particle &particle,
-                                                     double delta_t,
-                                                     double velocity) {
+                                                    double delta_t,
+                                                    double velocity) {
   particle.x += velocity * delta_t * cos(particle.x);
   particle.y += velocity * delta_t * sin(particle.x);
 }
 
 void ParticleFilter::predictParticleUsingYawrate(Particle &particle,
-                                                  double delta_t,
-                                                  double velocity,
-                                                  double yaw_rate) {
+                                                 double delta_t,
+                                                 double velocity,
+                                                 double yaw_rate) {
   double new_theta = particle.theta + yaw_rate * delta_t;
   particle.x += velocity / yaw_rate * (sin(new_theta) - sin(particle.theta));
   particle.y += velocity / yaw_rate * (cos(particle.theta) - cos(new_theta));
@@ -126,7 +127,7 @@ vector<double> ParticleFilter::getWeightsForObservations(
         return getWeight(obsInMapCoords, best_landmark, std_landmark);
       };
 
-  return map2(observations, getWeightForObservation);
+  return map2<LandmarkObs, double>(observations, getWeightForObservation);
 }
 
 double ParticleFilter::multiply(const vector<double> &numbers) {
@@ -134,7 +135,7 @@ double ParticleFilter::multiply(const vector<double> &numbers) {
 }
 
 vector<double> ParticleFilter::getWeightsOfParticles() {
-  return map2(particles, [](Particle particle) {return particle.weight;});
+  return map2<Particle, double>(particles, [](Particle particle) {return particle.weight;});
 }
 
 void ParticleFilter::resample() {
@@ -180,6 +181,7 @@ double ParticleFilter::gauss(double x, double mean, double stddev) {
 
 double ParticleFilter::getWeight(const LandmarkObs &obs,
                                  const LandmarkObs &best_landmark,
+                                 // TODO: alle Arrays als const reference übergeben auch an anderen Stellen.
                                  double std_landmark[]) {
 
   return gauss(obs.x, best_landmark.x, std_landmark[0])
