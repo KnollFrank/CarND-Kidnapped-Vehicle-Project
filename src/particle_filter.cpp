@@ -14,6 +14,7 @@
 #include <sstream>
 #include <string>
 #include <iterator>
+#include <functional>
 
 #include "particle_filter.h"
 
@@ -26,6 +27,14 @@ template<typename T, typename R, typename unop>
 vector<R> map2(const vector<T> &v, unop op) {
   vector<R> result(v.size());
   transform(v.begin(), v.end(), result.begin(), op);
+  return result;
+}
+
+// adapted from: https://stackoverflow.com/questions/21204676/modern-way-to-filter-stl-container
+template<typename T>
+vector<T> filter(const vector<T>& v, function<bool(const T&)> predicate) {
+  vector<T> result;
+  copy_if(v.cbegin(), v.cend(), back_inserter(result), predicate);
   return result;
 }
 
@@ -92,9 +101,23 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
                                    const vector<LandmarkObs> &observations,
                                    const Map &map_landmarks) {
 
+  const vector<LandmarkObs>& observationsWithinSensorRange =
+      getObservationsWithinSensorRange(sensor_range, observations);
+
   for (Particle &particle : particles) {
-    updateWeight(particle, std_landmark, observations, map_landmarks);
+    updateWeight(particle, std_landmark, observationsWithinSensorRange,
+                 map_landmarks);
   }
+}
+
+vector<LandmarkObs> ParticleFilter::getObservationsWithinSensorRange(
+    double sensor_range, const vector<LandmarkObs> &observations) {
+
+  auto isObservationWithinSensorRange = [&](const LandmarkObs& obs) {
+    return dist(obs.x, obs.y, 0, 0) <= sensor_range;
+  };
+
+  return filter<LandmarkObs>(observations, isObservationWithinSensorRange);
 }
 
 void ParticleFilter::updateWeight(Particle &particle, double std_landmark[],
@@ -135,7 +158,8 @@ double ParticleFilter::multiply(const vector<double> &numbers) {
 }
 
 vector<double> ParticleFilter::getWeightsOfParticles() {
-  return map2<Particle, double>(particles, [](Particle particle) {return particle.weight;});
+  return map2<Particle, double>(
+      particles, [](const Particle& particle) {return particle.weight;});
 }
 
 void ParticleFilter::resample() {
@@ -181,7 +205,6 @@ double ParticleFilter::gauss(double x, double mean, double stddev) {
 
 double ParticleFilter::getWeight(const LandmarkObs &obs,
                                  const LandmarkObs &best_landmark,
-                                 // TODO: alle Arrays als const reference übergeben auch an anderen Stellen.
                                  double std_landmark[]) {
 
   return gauss(obs.x, best_landmark.x, std_landmark[0])

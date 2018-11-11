@@ -92,6 +92,10 @@ class ParticleFilter {
   void updateWeight(Particle &particle, double std_landmark[],
                     const std::vector<LandmarkObs> &observations,
                     const Map &map_landmarks);
+
+  std::vector<LandmarkObs> getObservationsWithinSensorRange(
+      double sensor_range, const std::vector<LandmarkObs> &observations);
+
   /**
    * resample Resamples from the updated set of particles to form
    *   the new set of particles.
