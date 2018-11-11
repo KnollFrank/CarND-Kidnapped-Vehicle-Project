@@ -82,8 +82,8 @@ void ParticleFilter::predictParticle(Particle& particle, double delta_t,
 void ParticleFilter::predictParticleIgnoringYawrate(Particle& particle,
                                                     double delta_t,
                                                     double velocity) {
-  particle.x += velocity * delta_t * cos(particle.x);
-  particle.y += velocity * delta_t * sin(particle.x);
+  particle.x += velocity * delta_t * cos(particle.theta);
+  particle.y += velocity * delta_t * sin(particle.theta);
 }
 
 void ParticleFilter::predictParticleUsingYawrate(Particle& particle,
